@@ -185,43 +185,140 @@ if(isset($_POST["btnsearch"]))
 {
   if($_POST["searchday"] == "Daily")
   {
-    date_default_timezone_set("Asia/Kuala_Lumpur")
-    ?>
-
-    <input type="date" name="dailydate"/>
-    <input type="submit" name="btndaily" value="Search"/>
- <?php
-  }
-if(isset($_POST["btndaily"]))
-{
-  $sday = $_POST["dailydate"];
-  $answer = mysql_query("select * from sales where SalesDate like '$sday%'");
-  $row1 = mysql_fetch_assoc($answer);
-  if(mysql_fetch_row($answer) > 0)
-  {
-    $query = mysql_query("select SUM(SalesQuantity) as q from sales");
+    $sday = date("Y-m-d");
+    $query = mysql_query("SELECT SUM(SalesQuantity) as q FROM sales WHERE SalesDate= '$sday'");
     $count = mysql_fetch_assoc($query);
-  ?>
-    Today sales is <?php echo $count['q']; ?>.
-  <?php
-  }
-  else {
+    if(mysql_num_rows($query)> 0){
+	$c = $count["q"];
+    echo "Today sales is ".$c;
+	}
+    else{
     ?>
       <script>
-        alert("<?php echo $sday; ?>");
+        alert("<?php echo "Today No Sales"; ?>");
       </script>
     <?php
-  }
-}
-  if($_POST["searchday"] == "Month")
-  {
-    $answer2 = mysql_query("SELECT `StaffID` AS Staff, SUM(`SalesQuantity`) AS MONTHNAME(`SalesDate`) FROM `sales`");
-
-    $row2 = mysql_fetch_assoc($answer2);
-    while(mysql_fetch_row($row2))
-    {
-      echo $row2;
     }
+  }
+  elseif($_POST["searchday"] == "Month")
+  {
+    $answer2 = mysql_query("SELECT
+  StaffID,
+  sum(if(month(SalesDate) = 1, SalesQuantity, 0))  AS Jan,
+  sum(if(month(SalesDate) = 2, SalesQuantity, 0))  AS Feb,
+  sum(if(month(SalesDate) = 3, SalesQuantity, 0))  AS Mar,
+  sum(if(month(SalesDate) = 4, SalesQuantity, 0))  AS Apr,
+  sum(if(month(SalesDate) = 5, SalesQuantity, 0))  AS May,
+  sum(if(month(SalesDate) = 6, SalesQuantity, 0))  AS Jun,
+  sum(if(month(SalesDate) = 7, SalesQuantity, 0))  AS Jul,
+  sum(if(month(SalesDate) = 8, SalesQuantity, 0))  AS Aug,
+  sum(if(month(SalesDate) = 9, SalesQuantity, 0))  AS Sep,
+  sum(if(month(SalesDate) = 10, SalesQuantity, 0)) AS Oct,
+  sum(if(month(SalesDate) = 11, SalesQuantity, 0)) AS Nov,
+  sum(if(month(SalesDate) = 12, SalesQuantity, 0)) AS `Dec`
+FROM sales
+GROUP BY StaffID");
+ ?>
+ <table>
+      <tr>
+        <td>Satff ID</td>
+        <td>Jan</td>
+        <td>Feb</td>
+        <td>Mar</td>
+        <td>Apr</td>
+        <td>May</td>
+        <td>June</td>
+        <td>Jul</td>
+        <td>Aug</td>
+        <td>Sep</td>
+        <td>Oct</td>
+        <td>Nov</td>
+        <td>Dec</td>
+      </tr>
+      <?php
+      while ($row2 = mysql_fetch_array($answer2)) {
+       ?>
+      <tr>
+        <td><?php echo $row2["StaffID"]; ?></td>
+        <td><?php echo $row2["Jan"]; ?></td>
+        <td><?php echo $row2["Feb"]; ?></td>
+        <td><?php echo $row2["Mar"]; ?></td>
+        <td><?php echo $row2["Apr"]; ?></td>
+        <td><?php echo $row2["May"]; ?></td>
+        <td><?php echo $row2["Jun"]; ?></td>
+        <td><?php echo $row2["Jul"]; ?></td>
+        <td><?php echo $row2["Aug"]; ?></td>
+        <td><?php echo $row2["Sep"]; ?></td>
+        <td><?php echo $row2["Oct"]; ?></td>
+        <td><?php echo $row2["Nov"]; ?></td>
+        <td><?php echo $row2["Dec"]; ?></td>
+      </tr>
+      <?php
+      }
+       ?>
+ </table>
+<?php
+  }
+  elseif($_POST["searchday"] == "soldItem")
+  {
+      $answer3 = mysql_query("SELECT
+  sales.ProductID,product.ProductName,
+  MAX(if(month(SalesDate) = 1, SalesQuantity, 0))  AS Jan,
+  MAX(if(month(SalesDate) = 2, SalesQuantity, 0))  AS Feb,
+  MAX(if(month(SalesDate) = 3, SalesQuantity, 0))  AS Mar,
+  MAX(if(month(SalesDate) = 4, SalesQuantity, 0))  AS Apr,
+  MAX(if(month(SalesDate) = 5, SalesQuantity, 0))  AS May,
+  MAX(if(month(SalesDate) = 6, SalesQuantity, 0))  AS Jun,
+  MAX(if(month(SalesDate) = 7, SalesQuantity, 0))  AS Jul,
+  MAX(if(month(SalesDate) = 8, SalesQuantity, 0))  AS Aug,
+  MAX(if(month(SalesDate) = 9, SalesQuantity, 0))  AS Sep,
+  MAX(if(month(SalesDate) = 10, SalesQuantity, 0)) AS Oct,
+  MAX(if(month(SalesDate) = 11, SalesQuantity, 0)) AS Nov,
+  MAX(if(month(SalesDate) = 12, SalesQuantity, 0)) AS `Dec`
+FROM sales JOIN product ON sales.ProductID=product.ProductID
+GROUP BY ProductID");
+      ?>
+      <table>
+           <tr>
+             <td>Product ID</td>
+             <td>Product Name</td>
+             <td>Jan</td>
+             <td>Feb</td>
+             <td>Mar</td>
+             <td>Apr</td>
+             <td>May</td>
+             <td>June</td>
+             <td>Jul</td>
+             <td>Aug</td>
+             <td>Sep</td>
+             <td>Oct</td>
+             <td>Nov</td>
+             <td>Dec</td>
+           </tr>
+           <?php
+              while ($row3 = mysql_fetch_array($answer3)) {
+            ?>
+           <tr>
+             <td><?php echo $row3["ProductID"]; ?></td>
+             <td><?php echo $row3["ProductName"]; ?></td>
+             <td><?php echo $row3["Jan"]; ?></td>
+             <td><?php echo $row3["Feb"]; ?></td>
+             <td><?php echo $row3["Mar"]; ?></td>
+             <td><?php echo $row3["Apr"]; ?></td>
+             <td><?php echo $row3["May"]; ?></td>
+             <td><?php echo $row3["Jun"]; ?></td>
+             <td><?php echo $row3["Jul"]; ?></td>
+             <td><?php echo $row3["Aug"]; ?></td>
+             <td><?php echo $row3["Sep"]; ?></td>
+             <td><?php echo $row3["Oct"]; ?></td>
+             <td><?php echo $row3["Nov"]; ?></td>
+             <td><?php echo $row3["Dec"]; ?></td>
+           </tr>
+           <?php
+         }
+            ?>
+      </table>
+      <?php
   }
 }
  ?>
