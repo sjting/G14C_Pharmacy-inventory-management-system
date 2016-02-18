@@ -44,8 +44,18 @@ if(isset($_POST["Itemsold"]))
   $quantity = $_POST["quantity"];
   $sItem = $q - $quantity;
   date_default_timezone_set('Asia/Kuala_Lumpur');
-  $sdate = date("d M Y h:i:s A");
+  $sdate = date("Y-m-d");
 
+ if($sItem <=0){
+  ?>
+
+		<script type="text/javascript">
+			alert("Invalid data");
+		</script>
+
+<?php
+ }
+ else{
   mysql_query("update product set ProductQuantity = $sItem where ProductCode = '$c'");
   mysql_query("insert into sales (SalesQuantity,SalesDate,ProductID,StaffID) values ('$quantity','$sdate',$id,$sess_sid)");
   ?>
@@ -54,7 +64,7 @@ if(isset($_POST["Itemsold"]))
 			alert("Sold <?php echo $quantity; ?> Items ");
 		</script>
 
-	<?php
+  <?php
 
 }
 ?>
