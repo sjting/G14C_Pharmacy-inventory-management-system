@@ -3,6 +3,7 @@ include("connection.php");
 
 if (isset($_POST["login"])) // check which button is clicked
 {
+	if(!empty($_POST["type"])){
 	if($_POST["type"] == "staff"){
 	// get values from the form
 	$susrname = trim($_POST["username"]);
@@ -64,6 +65,16 @@ if (isset($_POST["login"])) // check which button is clicked
 
 	 	<?php
 	 	}
+	}
+	}
+	else{
+		?>
+
+	 		<script type="text/javascript">
+	 			alert("Please select user type");
+	 		</script>
+
+	 	<?php	
 	}
 }
 if(isset($_POST["register"]))
